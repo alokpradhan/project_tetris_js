@@ -13,9 +13,14 @@
 // Piece queue
 // gameBoard
 var model = {
+
+  gameboard:  {},
+  pieceQueue: {},
+
   init: function(){
     model.createGameBoard();
   },
+
   createGameBoard: function(){
     for (var i = 0; i < 200; i++){
       gameboard[i] = "";
@@ -25,24 +30,24 @@ var model = {
       gameBoard[el] = newPiece;
     });
     gameBoard[newPiece.positon] = newPiece;
-  }
-  gameboard: {},
-  pieceQueue:,
+  },
+
   createPiece: function(){
     var pieceToAdd = new Piece();
-    pieceToAdd.positon = [5];
-    pieceToAdd.active = true;
+    // pieceToAdd.positon = [5];
+    // pieceToAdd.active = true;
     pieceToAdd.shape = "singleSquare";
     pieceToAdd.color = "blue";
     return pieceToAdd;
   },
+
   Piece: function(){
-    this.position; // id of element
-    this.shape;
-    this.color;
-    this.moving; // true or false
+    this.position = [5]; // id of element
+    this.shape = '';
+    this.color = '';
+    this.active = true; // true or false
   }
-}
+};
 
 
 // View:
@@ -52,23 +57,34 @@ var model = {
 // keyPressListener()
 
 var view = {
-  init: function(grid){
-    view.initializeGrid(grid);
-  },
-  initializeGrid: function(){
 
+  init: function(gridSize){
+    view.initializeGrid(gridSize);
   },
+
+  initializeGrid: function(gridSize){
+    for(var i=1; i <= gridSize; i++){
+      $('#gameboard').append('<div class="cell" id="'+i+'"></div>');
+      console.log(gridSize);
+      if (i % 10 === 0){
+        $('#gameboard').append('<br>');
+      }
+    }
+  },
+
   updatePieces: function(){
     view.moveActivePiece();
     view.destoryStaticPieces();
   },
+
   moveActivePiece: function(){
 
   },
+
   destoryStaticPieces: function(){
 
   }
-}
+};
 
 
 // Controller:
@@ -79,17 +95,27 @@ var view = {
 // init
 // checkGameOver()
 var controller = {
+
+  gridSize: 400,
+  level: 1,
+
   init: function(){
     controller.setDifficultyLevel();
     view.init(controller.gridSize);
     controller.gameLoop();
   },
-  gridSize: 200,
-  speed: 1,
+
   gameLoop: function(){
     view.updatePieces();
     window.gameLoop = window.setInterval(function(){
       view.updatePieces();
-    }, 1000 / controller.level)
+    }, 1000 / controller.level);
+  },
+
+  setDifficultyLevel: function(){
+    controller.level = prompt("Select difficulty: Enter 1 for easy, 2 for difficult");
   }
-}
+
+};
+
+$(document).ready(function(){controller.init();});
