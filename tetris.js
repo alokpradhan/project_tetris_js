@@ -15,7 +15,7 @@
 var model = {
 
   gameboard:  {},
-  pieceQueue: {},
+  pieceQueue: [],
 
   init: function(){
     model.createGameBoard();
@@ -41,8 +41,23 @@ var model = {
     return pieceToAdd;
   },
 
+  // addPieceToQueue: function(){
+  //   model.pieceQueue.push(model.createPiece());
+  // },
+
+
+  newCurrentPiece: function(){
+    var newPiece = model.createPiece();
+    gameboard[newPiece.positon] = newPiece;
+  },
+
+  stopPieceMovement: function(piece){
+    piece.active = false;
+
+  },
+
   Piece: function(){
-    this.position = [5]; // id of element
+    this.positions = [5]; // id of element
     this.shape = '';
     this.color = '';
     this.active = true; // true or false
@@ -78,6 +93,11 @@ var view = {
   },
 
   moveActivePiece: function(){
+    for (var i = 0; i < model.currentPiece.positions.length; i++){
+      var currendID = model.currentPiece.positions[i]
+      model.gameboard[currentID]
+      model.currentPiece.positions[i] += 10;
+    }
 
   },
 
@@ -106,7 +126,6 @@ var controller = {
   },
 
   gameLoop: function(){
-    view.updatePieces();
     window.gameLoop = window.setInterval(function(){
       view.updatePieces();
     }, 1000 / controller.level);
