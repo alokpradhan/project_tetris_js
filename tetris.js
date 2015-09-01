@@ -17,6 +17,7 @@ var model = {
   gameboard:  {},
   // pieceQueue: [],
   currentPiece: '',
+  divsToDestroy: [],
 
   init: function(){
     model.createGameBoard();
@@ -54,6 +55,31 @@ var model = {
     model.newCurrentPiece();
   },
 
+  checkDestroyLine: function(){
+    var row_full = false;
+    for(var i = controller.gridSize; i > 0; i--){
+      row_full = false;
+      model.divsToDestroy = [];
+      for(var j = i; j > i - view.step; j--){
+        if (model.gameboard[i] !== ''){
+          model.divsToDestroy.push(i);
+          row_full = true;
+        } else {
+          row_full = false;
+        }
+      }
+    }
+    return row_full;
+  },
+
+  destroyLine: function(){
+    if (model.checkDestroyLine()){
+      for(var i=0; i < view.step; i++){
+        model.gameboard[model.divsToDestroy[i]] = '';
+      }
+    }
+  },
+
   Piece: function(){
     this.positions = [5]; // id of element
     this.shape = '';
@@ -71,7 +97,7 @@ var model = {
 
 var view = {
 
-  direction: '',
+  currentDirection: '',
   step: 10,
 
   init: function(gridSize){
@@ -105,7 +131,7 @@ var view = {
 
   testIfBrick: function(div){
     return $('#' + (div)).hasClass("blue") || $('#' + (div)).hasClass("yellow") ||
-           $('#' + (div)).hasClass("red")  || $('#' + (div)).hasClass("green")
+           $('#' + (div)).hasClass("red")  || $('#' + (div)).hasClass("green");
   },
 
   moveActivePiece: function(){
@@ -113,8 +139,11 @@ var view = {
       var currentID = model.currentPiece.positions[i];
       if (currentID + view.step > 200 || view.testIfBrick(currentID + view.step)){
         model.stopPieceMovement();
-      }
-      else {
+      } else {
+        if (currentID + view.step + view.step > 200 ||
+            view.testIfBrick(currentID + view.step + view.step)) {
+          view.currentDirection = '38';
+        }
         $('#'+ currentID).removeClass(model.currentPiece.color);
         divToMoveToID = view.newPieceDiv(currentID);  // currentID + view.step;
         $('#'+ divToMoveToID).addClass(model.currentPiece.color);
@@ -126,7 +155,11 @@ var view = {
   },
 
   destoryStaticPieces: function(){
+    // for(var i = 0; i < view.step; i++){
+    //   for(var j = 0; i < view.step; i++){
 
+    //   }
+    // }
   },
 
   setPieceDirection: function(event){
