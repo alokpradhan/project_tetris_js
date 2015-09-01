@@ -15,7 +15,8 @@
 var model = {
 
   gameboard:  {},
-  pieceQueue: [],
+  // pieceQueue: [],
+  currentPiece: '',
 
   init: function(){
     model.createGameBoard();
@@ -23,19 +24,17 @@ var model = {
 
   createGameBoard: function(){
     for (var i = 0; i < 200; i++){
-      gameboard[i] = "";
+      model.gameboard[i] = "";
     }
-    var newPiece = model.createPiece();
-    newPiece.position.forEach(function(el){
-      gameBoard[el] = newPiece;
+    model.currentPiece = model.createPiece();
+    model.currentPiece.positions.forEach(function(el){
+      model.gameboard[el] = model.currentPiece;
     });
-    gameBoard[newPiece.positon] = newPiece;
+    model.gameboard[model.currentPiece.positons] = model.currentPiece;
   },
 
   createPiece: function(){
-    var pieceToAdd = new Piece();
-    // pieceToAdd.positon = [5];
-    // pieceToAdd.active = true;
+    var pieceToAdd = new model.Piece();
     pieceToAdd.shape = "singleSquare";
     pieceToAdd.color = "blue";
     return pieceToAdd;
@@ -45,22 +44,20 @@ var model = {
   //   model.pieceQueue.push(model.createPiece());
   // },
 
-
   newCurrentPiece: function(){
-    var newPiece = model.createPiece();
-    gameboard[newPiece.positon] = newPiece;
+    model.currentPiece = model.createPiece();
+    model.gameboard[model.currentPiece.positons] = model.currentPiece;
   },
 
   stopPieceMovement: function(piece){
-    piece.active = false;
-
+    // piece.active = false;
   },
 
   Piece: function(){
     this.positions = [5]; // id of element
     this.shape = '';
     this.color = '';
-    this.active = true; // true or false
+    // this.active = true; // true or false
   }
 };
 
@@ -73,8 +70,14 @@ var model = {
 
 var view = {
 
+  direction: '',
+
   init: function(gridSize){
     view.initializeGrid(gridSize);
+    view.initializePiece();
+    $(document).keydown(function(event){
+      view.setPieceDirection(event);
+    });
   },
 
   initializeGrid: function(gridSize){
@@ -87,6 +90,12 @@ var view = {
     }
   },
 
+  initializePiece: function(){
+    for (var i = 0; i < model.currentPiece.positions.length; i++){
+      $('#'+ model.currentPiece.positions[i]).addClass(model.currentPiece.color);
+    }
+  },
+
   updatePieces: function(){
     view.moveActivePiece();
     view.destoryStaticPieces();
@@ -94,16 +103,49 @@ var view = {
 
   moveActivePiece: function(){
     for (var i = 0; i < model.currentPiece.positions.length; i++){
-      var currendID = model.currentPiece.positions[i]
-      model.gameboard[currentID]
-      model.currentPiece.positions[i] += 10;
+      var currentID = model.currentPiece.positions[i];
+      $('#'+ currentID).removeClass(model.currentPiece.color);
+      divToMoveToID = view.newPieceDiv(currentID);  // currentID + 10;
+      $('#'+ divToMoveToID).addClass(model.currentPiece.color);
+      model.currentPiece.positions[i] = divToMoveToID;
+      model.gameboard[currentID] = '';
+      model.gameboard[divToMoveToID] = model.currentPiece;
     }
-
   },
 
   destoryStaticPieces: function(){
 
+  },
+
+  setPieceDirection: function(event){
+    view.currentDirection = view.userMove[event.which];
+  },
+
+  newPieceDiv: function(currentDiv) {
+    var divIdToMoveTo = 0;
+    switch (this.currentDirection) {
+      case 'left' :
+        divIdToMoveTo = currentDiv - 1 + 10;
+        break;
+      case 'right' :
+        divIdToMoveTo = currentDiv + 1 + 10;
+        break;
+      case 'down':
+        divIdToMoveTo = currentDiv + 10 + 10;
+        break;
+      default:
+        divIdToMoveTo = currentDiv + 10;
+    }
+    this.currentDirection = '38';
+    return divIdToMoveTo;
+  },
+
+  userMove: {
+    37: 'left',
+    39: 'right',
+    40: 'down'
   }
+
 };
 
 
@@ -121,6 +163,7 @@ var controller = {
 
   init: function(){
     controller.setDifficultyLevel();
+    model.init();
     view.init(controller.gridSize);
     controller.gameLoop();
   },

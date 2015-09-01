@@ -9,3 +9,11 @@
 #gameboard{
   line-height: 0;
 }
+
+.blue{
+  background-color: blue;
+}
+
+.green{
+  background-color: green;
+}
