@@ -75,7 +75,11 @@ var model = {
   destroyLine: function(){
     if (model.checkDestroyLine()){
       for(var i=0; i < view.step; i++){
-        model.gameboard[model.divsToDestroy[i]] = '';
+        deleteDiv = model.divsToDestroy[i];
+        while (deleteDiv-view.step > 0) {
+          model.gameboard[deleteDiv] = model.gameboard[deleteDiv-view.step];
+          deleteDiv = deleteDiv-view.step;
+        }
       }
     }
   },
