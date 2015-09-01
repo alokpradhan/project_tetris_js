@@ -51,6 +51,7 @@ var model = {
 
   stopPieceMovement: function(piece){
     // piece.active = false;
+    model.newCurrentPiece();
   },
 
   Piece: function(){
@@ -71,6 +72,7 @@ var model = {
 var view = {
 
   direction: '',
+  step: 10,
 
   init: function(gridSize){
     view.initializeGrid(gridSize);
@@ -101,15 +103,25 @@ var view = {
     view.destoryStaticPieces();
   },
 
+  testIfBrick: function(div){
+    return $('#' + (div)).hasClass("blue") || $('#' + (div)).hasClass("yellow") ||
+           $('#' + (div)).hasClass("red")  || $('#' + (div)).hasClass("green")
+  },
+
   moveActivePiece: function(){
     for (var i = 0; i < model.currentPiece.positions.length; i++){
       var currentID = model.currentPiece.positions[i];
-      $('#'+ currentID).removeClass(model.currentPiece.color);
-      divToMoveToID = view.newPieceDiv(currentID);  // currentID + 10;
-      $('#'+ divToMoveToID).addClass(model.currentPiece.color);
-      model.currentPiece.positions[i] = divToMoveToID;
-      model.gameboard[currentID] = '';
-      model.gameboard[divToMoveToID] = model.currentPiece;
+      if (currentID + view.step > 200 || view.testIfBrick(currentID + view.step)){
+        model.stopPieceMovement();
+      }
+      else {
+        $('#'+ currentID).removeClass(model.currentPiece.color);
+        divToMoveToID = view.newPieceDiv(currentID);  // currentID + view.step;
+        $('#'+ divToMoveToID).addClass(model.currentPiece.color);
+        model.currentPiece.positions[i] = divToMoveToID;
+        model.gameboard[currentID] = '';
+        model.gameboard[divToMoveToID] = model.currentPiece;
+      }
     }
   },
 
@@ -125,16 +137,16 @@ var view = {
     var divIdToMoveTo = 0;
     switch (this.currentDirection) {
       case 'left' :
-        divIdToMoveTo = currentDiv - 1 + 10;
+        divIdToMoveTo = currentDiv - 1 + view.step;
         break;
       case 'right' :
-        divIdToMoveTo = currentDiv + 1 + 10;
+        divIdToMoveTo = currentDiv + 1 + view.step;
         break;
       case 'down':
-        divIdToMoveTo = currentDiv + 10 + 10;
+        divIdToMoveTo = currentDiv + view.step + view.step;
         break;
       default:
-        divIdToMoveTo = currentDiv + 10;
+        divIdToMoveTo = currentDiv + view.step;
     }
     this.currentDirection = '38';
     return divIdToMoveTo;
@@ -158,7 +170,7 @@ var view = {
 // checkGameOver()
 var controller = {
 
-  gridSize: 400,
+  gridSize: 200,
   level: 1,
 
   init: function(){
