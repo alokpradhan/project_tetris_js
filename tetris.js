@@ -1,3 +1,4 @@
+
 // --------- Model -----------
 
 var model = {
@@ -60,7 +61,7 @@ var model = {
         }
       }
       if (row_full){
-        console.log("check destroy line is running " + model.divsToDestroy.length);
+        // console.log("check destroy line is running " + model.divsToDestroy.length);
         model.destroyLine();
       }
     }
@@ -146,15 +147,19 @@ var view = {
             view.testIfBrick(currentID + view.step + view.step)) {
           view.currentDirection = '38';
         }
-        $('#'+ currentID).removeClass(model.currentPiece.color);
-        divToMoveToID = view.newPieceDiv(currentID);  // currentID + view.step;
-        $('#'+ divToMoveToID).addClass(model.currentPiece.color);
-        model.currentPiece.positions[i] = divToMoveToID;
-        model.gameboard[currentID] = '';
-        model.gameboard[divToMoveToID] = model.currentPiece;
+        view.makeMove(currentID, i);
       }
     }
     view.destoryStaticPieces();
+  },
+
+  makeMove: function(currentID, divID){
+    $('#'+ currentID).removeClass(model.currentPiece.color);
+    divToMoveToID = view.newPieceDiv(currentID);
+    $('#'+ divToMoveToID).addClass(model.currentPiece.color);
+    model.currentPiece.positions[divID] = divToMoveToID;
+    model.gameboard[currentID] = '';
+    model.gameboard[divToMoveToID] = model.currentPiece;
   },
 
   destoryStaticPieces: function(){
