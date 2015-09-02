@@ -37,13 +37,18 @@ var model = {
   createPiece: function(){
     var pieceToAdd = new model.Piece();
     pieceToAdd.shape = "singleSquare";
-    pieceToAdd.color = "blue";
+    pieceToAdd.color = model.colorPiece();
     return pieceToAdd;
   },
 
   // addPieceToQueue: function(){
   //   model.pieceQueue.push(model.createPiece());
   // },
+
+  colorPiece: function(){
+    var colors = ['blue','red','green','yellow'];
+    return colors[Math.floor(Math.random()*4)];
+  },
 
   newCurrentPiece: function(){
     model.currentPiece = model.createPiece();
@@ -126,7 +131,7 @@ var view = {
   },
 
   initializePiece: function(){
-    for (var i = 0; i <= model.currentPiece.positions.length; i++){
+    for (var i = 0; i < model.currentPiece.positions.length; i++){
       $('#'+ model.currentPiece.positions[i]).addClass(model.currentPiece.color);
     }
   },
