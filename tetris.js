@@ -117,7 +117,7 @@ var view = {
 
   initializeGrid: function(gridSize){
     for(var i=1; i <= gridSize; i++){
-      $('#gameboard').append('<div class="cell" id="'+i+'"></div>');
+      $('#gameboard').append('<div class="cell" id="'+(i-1)+'"></div>');
       console.log(gridSize);
       if (i % 10 === 0){
         $('#gameboard').append('<br>');
@@ -126,7 +126,7 @@ var view = {
   },
 
   initializePiece: function(){
-    for (var i = 0; i < model.currentPiece.positions.length; i++){
+    for (var i = 0; i <= model.currentPiece.positions.length; i++){
       $('#'+ model.currentPiece.positions[i]).addClass(model.currentPiece.color);
     }
   },
