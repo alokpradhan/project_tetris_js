@@ -41,7 +41,9 @@ var model = {
 
   newCurrentPiece: function(){
     model.currentPiece = model.createPiece();
-    model.gameboard[model.currentPiece.positons] = model.currentPiece;
+    for(var i=0; i < model.currentPiece.positions; i++){
+      model.gameboard[model.currentPiece.positons[i]] = model.currentPiece;
+    }
   },
 
   stopPieceMovement: function(piece){
@@ -78,9 +80,10 @@ var model = {
   },
 
   Piece: function(){
-    this.positions = [5]; // id of element
+    this.positions = [5,6,15,16]; // id of element
     this.shape = '';
     this.color = '';
+    this.structure = [1,1,1,1];
     // this.active = true; // true or false
   }
 };
@@ -147,7 +150,7 @@ var view = {
             view.testIfBrick(currentID + view.step + view.step)) {
           view.currentDirection = '38';
         }
-        view.makeMove(currentID, i);
+        view.makeMove(currentID, i); //MOVE THIS TO makeMove so whole object moves together
       }
     }
     view.destoryStaticPieces();
@@ -175,13 +178,15 @@ var view = {
     var divIdToMoveTo = 0;
     switch (this.currentDirection) {
       case 'left' :
-        divIdToMoveTo = currentDiv - 1 + view.step;
+        divIdToMoveTo = (currentDiv%10 === 0) ?
+                        currentDiv : (currentDiv - 1 + view.step);
         break;
       case 'right' :
-        divIdToMoveTo = currentDiv + 1 + view.step;
+        divIdToMoveTo = (currentDiv%10 === 9) ?
+                        currentDiv : (currentDiv + 1 + view.step);
         break;
       case 'down':
-        divIdToMoveTo = currentDiv + view.step + view.step;
+        divIdToMoveTo = currentDiv + view.step*3;
         break;
       default:
         divIdToMoveTo = currentDiv + view.step;
