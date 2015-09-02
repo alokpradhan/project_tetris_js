@@ -56,23 +56,28 @@ var model = {
   },
 
   checkDestroyLine: function(){
+    console.log("check destroy line is running " + model.divsToDestroy);
     var row_full = false;
-    for(var i = controller.gridSize; i > 0; i--){
+    for(var i = controller.gridSize; i > 0; i-=view.step){
       row_full = false;
       model.divsToDestroy = [];
       for(var j = i; j > i - view.step; j--){
-        if (model.gameboard[i] !== ''){
-          model.divsToDestroy.push(i);
+        if (model.gameboard[j] !== ''){
+          model.divsToDestroy.push(j);
           row_full = true;
         } else {
           row_full = false;
         }
       }
+
+      if (row_full){
+        return row_full
+      }
     }
-    return row_full;
   },
 
   destroyLine: function(){
+    console.log("destory line is running");
     if (model.checkDestroyLine()){
       for(var i=0; i < view.step; i++){
         deleteDiv = model.divsToDestroy[i];
@@ -133,6 +138,14 @@ var view = {
     view.destoryStaticPieces();
   },
 
+  renderGameboard: function(){
+    for (var i = 0; i < 200; i++){
+      if (model.gameboard[i] != ""){
+        piece = model.gameboard[i];
+        $("#" + i).addClass(piece.color);
+      }
+    }
+  },
   testIfBrick: function(div){
     return $('#' + (div)).hasClass("blue") || $('#' + (div)).hasClass("yellow") ||
            $('#' + (div)).hasClass("red")  || $('#' + (div)).hasClass("green");
@@ -156,14 +169,12 @@ var view = {
         model.gameboard[divToMoveToID] = model.currentPiece;
       }
     }
+    view.destoryStaticPieces();
   },
 
   destoryStaticPieces: function(){
-    // for(var i = 0; i < view.step; i++){
-    //   for(var j = 0; i < view.step; i++){
-
-    //   }
-    // }
+    model.destroyLine();
+    view.renderGameboard();
   },
 
   setPieceDirection: function(event){
@@ -220,7 +231,7 @@ var controller = {
   gameLoop: function(){
     window.gameLoop = window.setInterval(function(){
       view.updatePieces();
-    }, 1000 / controller.level);
+    }, 100 / controller.level);
   },
 
   setDifficultyLevel: function(){
