@@ -1,0 +1,29 @@
+
+Board is 10 blocks wide 20 blocks high
+At regular intervals blocks are moved down
+Stop when touching something below them (piece or ground)
+Pressing left or right moves piece but not past edge
+Pressing down speeds up movement of current piece
+
+Piece taken from pieceQuere
+Inserted at same position (top center of grid)
+Falls until moving = false
+Next
+
+Model:
+Piece queue
+gameBoard
+
+View:
+initializeGrid()
+renderGrid()
+movePiece()
+keyPressListener()
+
+Controller:
+Difficulty level-
+difficultyLevel
+setDifficultyLevel()
+interval loop
+init
+checkGameOver()

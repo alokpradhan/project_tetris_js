@@ -1,17 +1,5 @@
-// Board is 10 blocks wide 20 blocks high
-// At regular intervals blocks are moved down
-// Stop when touching something below them (piece or ground)
-// Pressing left or right moves piece but not past edge
-// Pressing down speeds up movement of current piece
+// --------- Model -----------
 
-// Piece taken from pieceQuere
-// Inserted at same position (top center of grid)
-// Falls until moving = false
-// Next
-
-// Model:
-// Piece queue
-// gameBoard
 var model = {
 
   gameboard:  {},
@@ -74,14 +62,11 @@ var model = {
       if (row_full){
         console.log("check destroy line is running " + model.divsToDestroy.length);
         model.destroyLine();
-        // return row_full;
       }
     }
-    // return row_full;
   },
 
   destroyLine: function(){
-    // if (model.checkDestroyLine()){
       for(var i=0; i < view.step; i++){
         deleteDiv = model.divsToDestroy[i];
         while (deleteDiv-view.step > 0) {
@@ -89,7 +74,6 @@ var model = {
           deleteDiv = deleteDiv-view.step;
         }
       }
-    // }
   },
 
   Piece: function(){
@@ -100,12 +84,7 @@ var model = {
   }
 };
 
-
-// View:
-// initializeGrid()
-// renderGrid()
-// movePiece()
-// keyPressListener()
+// --------- View -----------
 
 var view = {
 
@@ -214,14 +193,8 @@ var view = {
 
 };
 
+// --------- Controller -----------
 
-// Controller:
-// Difficulty level-
-// difficultyLevel
-// setDifficultyLevel()
-// interval loop
-// init
-// checkGameOver()
 var controller = {
 
   gridSize: 200,
