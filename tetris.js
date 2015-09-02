@@ -46,8 +46,8 @@ var model = {
     }
   },
 
-  stopPieceMovement: function(piece){
-    // piece.active = false;
+  stopPieceMovement: function(){
+    model.currentPiece.active = false;
     model.newCurrentPiece();
   },
 
@@ -84,7 +84,7 @@ var model = {
     this.shape = '';
     this.color = '';
     this.structure = [1,1,1,1];
-    // this.active = true; // true or false
+    this.active = true;
   }
 };
 
@@ -141,15 +141,18 @@ var view = {
   },
 
   moveActivePieces: function(){
-    checkMovements();
-    makeMove();
+    view.checkMovements();
+    view.makeMove();
     view.destoryStaticPieces();
   },
 
   checkMovements: function(){
     for (var i = 0; i < model.currentPiece.positions.length; i++){
       var currentID = model.currentPiece.positions[i];
-      if (currentID + view.step > 199 || view.testIfBrick(currentID + view.step)){
+      if (currentID + view.step > 199 ||
+        view.testIfBrick(currentID + view.step) &&
+        !(model.gameboard[currentID + view.step].active)
+        ){
         model.stopPieceMovement();
       } else {
         if (currentID + view.step + view.step > 199 ||
@@ -161,34 +164,24 @@ var view = {
   },
 
   removeClasses: function(){
-    $('#' + model.currentPiece.positions[0]).removeClass(model.currentPiece.color);
-    $('#' + model.currentPiece.positions[1]).removeClass(model.currentPiece.color);
-    $('#' + model.currentPiece.positions[2]).removeClass(model.currentPiece.color);
-    $('#' + model.currentPiece.positions[3]).removeClass(model.currentPiece.color);
-    model.gameboard[model.currentPiece.positions[0]] = '';
-    model.gameboard[model.currentPiece.positions[1]] = '';
-    model.gameboard[model.currentPiece.positions[2]] = '';
-    model.gameboard[model.currentPiece.positions[3]] = '';
+    for (var i=0; i < model.currentPiece.positions.length; i++) {
+      $('#' + model.currentPiece.positions[i]).removeClass(model.currentPiece.color);
+      model.gameboard[model.currentPiece.positions[i]] = '';
+    }
   },
 
   addClasses: function(divIdsToMoveTo){
-    $('#' + divIdsToMoveTo[0]).addClass(model.currentPiece.color);
-    $('#' + divIdsToMoveTo[1]).addClass(model.currentPiece.color);
-    $('#' + divIdsToMoveTo[2]).addClass(model.currentPiece.color);
-    $('#' + divIdsToMoveTo[3]).addClass(model.currentPiece.color);
-    model.gameboard[divIdsToMoveTo[0]] = model.currentPiece;
-    model.gameboard[divIdsToMoveTo[1]] = model.currentPiece;
-    model.gameboard[divIdsToMoveTo[2]] = model.currentPiece;
-    model.gameboard[divIdsToMoveTo[3]] = model.currentPiece;
-
-  }
+    for (var i=0; i < divIdsToMoveTo.length; i++) {
+      $('#' + divIdsToMoveTo[i]).addClass(model.currentPiece.color);
+      model.gameboard[divIdsToMoveTo[i]] = model.currentPiece;
+    }
+  },
 
   makeMove: function(){
-    divIdsToMoveTo = view.newPieceDiv();
-    removeClasses();
-    addClasses();
+    var divIdsToMoveTo = view.newPieceDiv();
+    view.removeClasses();
+    view.addClasses(divIdsToMoveTo);
     model.currentPiece.positions = divIdsToMoveTo;
-
   },
 
   destoryStaticPieces: function(){
@@ -201,45 +194,51 @@ var view = {
   },
 
   newPieceDiv: function() {
-    var divIdToMoveTo = 0;
+    var divIdsToMoveTo = [];
+    var moveID = 0;
     switch (this.currentDirection) {
       case 'left' :
-        divIdsToMoveTo = []
-        for (var i = 0; i < model.currentPiece.positions.length; i++){
-          moveID = (model.currentPiece.positions[i]%10 === 0) ?
-                    model.currentPiece.positions[i] : (model.currentPiece.positions[i] - 1 + view.step)
-          divIdsToMoveTo.push(moveID)
+        var doNotMove = false;
+        for (var m = 0; m < model.currentPiece.positions.length; m++){
+          var currentDivID = model.currentPiece.positions[l];
+          if (currentDivID%10 === 0){ doNotMove = true; }
         }
-        // divIdToMoveTo = (currentDiv%10 === 0) ?
-        //                 currentDiv : (currentDiv - 1 + view.step);
+
+        if(!doNotMove) {
+          for (var l = 0; l < model.currentPiece.positions.length; l++){
+            moveID = (model.currentPiece.positions[l] - 1 + view.step);
+            divIdsToMoveTo.push(moveID);
+          }
+        } else {
+          for (var p = 0; p < model.currentPiece.positions.length; p++){
+          moveID = model.currentPiece.positions[p] + view.step;
+          divIdsToMoveTo.push(moveID);
+          }
+        }
         break;
+
       case 'right' :
-        divIdsToMoveTo = []
         for (var i = 0; i < model.currentPiece.positions.length; i++){
           moveID = (model.currentPiece.positions[i]%10 === 9) ?
-                    model.currentPiece.positions[i] : (model.currentPiece.positions[i] + 1 + view.step)
-          divIdsToMoveTo.push(moveID)
+                    model.currentPiece.positions[i] : (model.currentPiece.positions[i] + 1 + view.step);
+          divIdsToMoveTo.push(moveID);
         }
-        // divIdToMoveTo = (currentDiv%10 === 9) ?
-        //                 currentDiv : (currentDiv + 1 + view.step);
         break;
       case 'down':
-        divIdsToMoveTo = []
-        for (var i = 0; i < model.currentPiece.positions.length; i++){
-          moveID = model.currentPiece.positions[i] + view.step*3
-          divIdsToMoveTo.push(moveID)
+        for (var j = 0; j < model.currentPiece.positions.length; j++){
+          moveID = model.currentPiece.positions[j] + view.step*3;
+          divIdsToMoveTo.push(moveID);
         }
-        // divIdToMoveTo = currentDiv + view.step*3;
         break;
       default:
-        divIdsToMoveTo = []
-        for (var i = 0; i < model.currentPiece.positions.length; i++){
-          moveID = model.currentPiece.positions[i] + view.step
-          divIdsToMoveTo.push(moveID)
+        for (var k = 0; k < model.currentPiece.positions.length; k++){
+          moveID = model.currentPiece.positions[k] + view.step;
+          divIdsToMoveTo.push(moveID);
         }
         // divIdToMoveTo = currentDiv + view.step;
     }
     this.currentDirection = '38';
+    console.log(divIdsToMoveTo);
     return divIdsToMoveTo;
   },
 
