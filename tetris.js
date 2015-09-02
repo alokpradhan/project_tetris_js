@@ -23,11 +23,16 @@ var model = {
     model.gameboard[model.currentPiece.positons] = model.currentPiece;
   },
 
+  factorySelection: function(){
+    var num = Math.floor(Math.random() * 7)
+    var pieces = ["SquareFactory", "LineFactory", "TFactory",
+                  "RightHandLFactory", "LeftHandLFactory",
+                  "LeftSFactory", "RightSFactory"]
+    return new model[pieces[num]]();
+  },
+
   createPiece: function(){
-    var pieceToAdd = new model.Piece();
-    pieceToAdd.shape = "singleSquare";
-    pieceToAdd.color = model.colorPiece();
-    return pieceToAdd;
+    return model.factorySelection();
   },
 
   // addPieceToQueue: function(){
@@ -79,12 +84,71 @@ var model = {
       }
   },
 
-  Piece: function(){
+  SquareFactory: function(){
     this.positions = [5,6,15,16]; // id of element
-    this.shape = '';
-    this.color = '';
+    this.shape = 'square';
+    this.color = model.colorPiece();
     this.structure = [1,1,1,1];
+    this.pivot = 6;
     this.active = true;
+  },
+
+  LeftSFactory: function(){
+    this.positions = [5,15,16,26]; // id of element
+    this.shape = 'left_s';
+    this.color = model.colorPiece();
+    this.structure = [1,1,1,1];
+    this.pivot = 15;
+    this.active = true;
+  },
+
+  RightSFactory: function(){
+    this.positions = [5,15,14,24]; // id of element
+    this.shape = 'right_s';
+    this.color = model.colorPiece();
+    this.structure = [11,0,9,-2];
+    this.pivot = 15;
+    this.active = true;
+  },
+
+  LineFactory: function(){
+    this.positions = [5,6,7,8]; // id of element
+    this.shape = 'line';
+    this.color = model.colorPiece();
+    this.structure = [1,1,1,1];
+    this.pivot = 8;
+    this.active = true;
+  },
+
+  LeftHandLFactory: function(){
+    this.positions = [5,6,7,17]; // id of element
+    this.shape = 'left_l';
+    this.color = model.colorPiece();
+    this.structure = [1,1,1,1];
+    this.pivot = 7;
+    this.active = true;
+  },
+
+  RightHandLFactory: function(){
+    this.positions = [15,5,6,7]; // id of element
+    this.shape = 'right_l';
+    this.color = model.colorPiece();
+    this.structure = [1,1,1,1];
+    this.pivot = 5;
+    this.active = true;
+  },
+
+  TFactory: function(){
+    this.positions = [5,6,7,16]; // id of element
+    this.shape = 't';
+    this.color = model.colorPiece();
+    this.structure = [1,1,1,1];
+    this.pivot = 6;
+    this.active = true;
+  },
+
+  rotatePiece: function(){
+
   }
 };
 
@@ -156,7 +220,10 @@ var view = {
         model.stopPieceMovement();
       } else {
         if (currentID + view.step + view.step > 199 ||
-            view.testIfBrick(currentID + view.step + view.step)) {
+            view.testIfBrick(currentID + view.step + view.step) ||
+            view.testIfBrick(currentID + view.step + 1) && !(model.gameboard[currentID + view.step + 1].active) ||
+            view.testIfBrick(currentID + view.step - 1) && !(model.gameboard[currentID + view.step - 1].active)
+            ) {
           view.currentDirection = '38';
         }
       }
@@ -200,7 +267,7 @@ var view = {
       case 'left' :
         var doNotMove = false;
         for (var m = 0; m < model.currentPiece.positions.length; m++){
-          var currentDivID = model.currentPiece.positions[l];
+          var currentDivID = model.currentPiece.positions[m];
           if (currentDivID%10 === 0){ doNotMove = true; }
         }
 
@@ -218,12 +285,30 @@ var view = {
         break;
 
       case 'right' :
-        for (var i = 0; i < model.currentPiece.positions.length; i++){
-          moveID = (model.currentPiece.positions[i]%10 === 9) ?
-                    model.currentPiece.positions[i] : (model.currentPiece.positions[i] + 1 + view.step);
+        var doNotMove = false;
+        for (var m = 0; m < model.currentPiece.positions.length; m++){
+          var currentDivID = model.currentPiece.positions[m];
+          if (currentDivID%10 === 9){ doNotMove = true; }
+        }
+
+        if(!doNotMove) {
+          for (var l = 0; l < model.currentPiece.positions.length; l++){
+            moveID = (model.currentPiece.positions[l] + 1 + view.step);
+            divIdsToMoveTo.push(moveID);
+          }
+        } else {
+          for (var p = 0; p < model.currentPiece.positions.length; p++){
+          moveID = model.currentPiece.positions[p] + view.step;
           divIdsToMoveTo.push(moveID);
+          }
         }
         break;
+        // for (var i = 0; i < model.currentPiece.positions.length; i++){
+        //   moveID = (model.currentPiece.positions[i]%10 === 9) ?
+        //             model.currentPiece.positions[i] : (model.currentPiece.positions[i] + 1 + view.step);
+        //   divIdsToMoveTo.push(moveID);
+        // }
+        // break;
       case 'down':
         for (var j = 0; j < model.currentPiece.positions.length; j++){
           moveID = model.currentPiece.positions[j] + view.step*3;
