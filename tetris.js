@@ -24,7 +24,7 @@ var model = {
   },
 
   createGameBoard: function(){
-    for (var i = 0; i < 200; i++){
+    for (var i = 0; i < controller.gridSize; i++){
       model.gameboard[i] = "";
     }
     model.currentPiece = model.createPiece();
@@ -55,30 +55,28 @@ var model = {
     model.newCurrentPiece();
   },
 
-  checkDestroyLine: function(){
-    console.log("check destroy line is running " + model.divsToDestroy);
+  checkAndDestroyLine: function(){
     var row_full = false;
-    for(var i = controller.gridSize; i > 0; i-=view.step){
-      row_full = false;
+    for(var i = controller.gridSize-1; i >= 0; i-=view.step){
+      row_full = true;
       model.divsToDestroy = [];
       for(var j = i; j > i - view.step; j--){
-        if (model.gameboard[j] !== ''){
-          model.divsToDestroy.push(j);
-          row_full = true;
-        } else {
+        model.divsToDestroy.push(j);
+        if (model.gameboard[j] === ''){
           row_full = false;
         }
       }
-
       if (row_full){
-        return row_full
+        console.log("check destroy line is running " + model.divsToDestroy.length);
+        model.destroyLine();
+        // return row_full;
       }
     }
+    // return row_full;
   },
 
   destroyLine: function(){
-    console.log("destory line is running");
-    if (model.checkDestroyLine()){
+    // if (model.checkDestroyLine()){
       for(var i=0; i < view.step; i++){
         deleteDiv = model.divsToDestroy[i];
         while (deleteDiv-view.step > 0) {
@@ -86,7 +84,7 @@ var model = {
           deleteDiv = deleteDiv-view.step;
         }
       }
-    }
+    // }
   },
 
   Piece: function(){
@@ -139,13 +137,16 @@ var view = {
   },
 
   renderGameboard: function(){
-    for (var i = 0; i < 200; i++){
-      if (model.gameboard[i] != ""){
-        piece = model.gameboard[i];
+    for (var i = 0; i < controller.gridSize; i++){
+      if (model.gameboard[i] !== ''){
+        var piece = model.gameboard[i];
         $("#" + i).addClass(piece.color);
+      } else {
+        $("#" + i).removeClass('green').removeClass('blue').removeClass('yellow').removeClass('red');
       }
     }
   },
+
   testIfBrick: function(div){
     return $('#' + (div)).hasClass("blue") || $('#' + (div)).hasClass("yellow") ||
            $('#' + (div)).hasClass("red")  || $('#' + (div)).hasClass("green");
@@ -173,7 +174,7 @@ var view = {
   },
 
   destoryStaticPieces: function(){
-    model.destroyLine();
+    model.checkAndDestroyLine();
     view.renderGameboard();
   },
 
