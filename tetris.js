@@ -155,10 +155,10 @@ var view = {
   moveActivePiece: function(){
     for (var i = 0; i < model.currentPiece.positions.length; i++){
       var currentID = model.currentPiece.positions[i];
-      if (currentID + view.step > 200 || view.testIfBrick(currentID + view.step)){
+      if (currentID + view.step > 199 || view.testIfBrick(currentID + view.step)){
         model.stopPieceMovement();
       } else {
-        if (currentID + view.step + view.step > 200 ||
+        if (currentID + view.step + view.step > 199 ||
             view.testIfBrick(currentID + view.step + view.step)) {
           view.currentDirection = '38';
         }
