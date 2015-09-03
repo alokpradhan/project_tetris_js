@@ -25,8 +25,8 @@ var model = {
 
   factorySelection: function(){
     // var num = Math.floor(Math.random() * 7);
-    var num = Math.floor(Math.random() * 2);
-    var pieces = ["LeftSFactory", "RightSFactory"];
+    var num = Math.floor(Math.random() * 3);
+    var pieces = ["LeftSFactory", "RightSFactory", "LeftHandLFactory"];
     // var pieces = ["SquareFactory", "LineFactory", "TFactory",
     //               "RightHandLFactory", "LeftHandLFactory",
     //               "LeftSFactory", "RightSFactory"];
@@ -100,6 +100,7 @@ var model = {
     this.shape = 'left_s';
     this.color = model.colorPiece();
     this.structure = [11,0,9,-2];
+    this.reverse = [11,0,9,-2];
     this.rorated = false;
     // this.pivot = 15;
     this.active = true;
@@ -110,6 +111,7 @@ var model = {
     this.shape = 'right_s';
     this.color = model.colorPiece();
     this.structure = [9,0,11,2];
+    this.reverse = [9,0,11,2];
     this.rorated = false;
     // this.pivot = 15;
     this.active = true;
@@ -137,7 +139,8 @@ var model = {
     this.positions = [15,5,6,7]; // id of element
     this.shape = 'right_l';
     this.color = model.colorPiece();
-    this.structure = [1,1,1,1];
+    this.structure = [2,9,20,-9];
+    this.reverse = [-10,-1,-10,19];
     this.pivot = 5;
     this.active = true;
   },
@@ -151,7 +154,7 @@ var model = {
     this.active = true;
   },
 
-  rotatePiece: function(){
+  rotatePiece: function(direction){
     for(var i = 0; i < model.currentPiece.positions.length; i++){
       if (!model.currentPiece.rotated){
         model.currentPiece.positions[i] += model.currentPiece.structure[i];
