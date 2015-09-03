@@ -1,40 +1,9 @@
 
 // --------- Model -----------
 
-var model = (function(){
-  var gameboard =  {};
-  // pieceQueue = [];
-  var currentPiece = '';
-  var divsToDestroy = [];
+var pieceModel = (function(){
 
-  var init = function(){
-    createGameBoard();
-  };
-
-  var createGameBoard = function(){
-    for (var i = 0; i < controller.gridSize; i++){
-      model.gameboard[i] = "";
-    }
-    model.currentPiece = createPiece();
-    model.currentPiece.positions.forEach(function(el){
-      model.gameboard[el] = model.currentPiece;
-    });
-    model.gameboard[model.currentPiece.positons] = model.currentPiece;
-  };
-
-  var getGameBoard = function(){
-    return gameboard;
-  };
-
-  var setGameBoard = function(i, object){
-    gameboard[i] = object;
-  };
-
-  var getCurrentPiece = function(){
-    return currentPiece;
-  };
-
-  var createPiece = function(){
+  var create = function(){
     var num = Math.floor(Math.random() * 7);
     // var num = Math.floor(Math.random() * 1);
     // var pieces = ["RightHandLFactory"];
@@ -44,24 +13,145 @@ var model = (function(){
     return new pieces[num]();
   };
 
-  // addPieceToQueue = function(){
-  //   model.pieceQueue.push(model.createPiece());
-  // },
-
-  var colorPiece = function(){
+  var addColor = function(){
     var colors = ['blue','red','green','yellow'];
     return colors[Math.floor(Math.random()*4)];
   };
 
+    var SquareFactory = function(){
+    this.positions = [5,6,15,16]; // id of element
+    // this.shape = 'square';
+    this.color = addColor();
+    this.structure = [1,1,1,1];
+    // this.pivot = 6;
+    this.active = true;
+  };
+
+  var LeftSFactory = function(){
+    this.positions = [5,15,16,26]; // id of element
+    // this.shape = 'left_s';
+    this.color = addColor();
+    this.structure = [11,0,9,-2];
+    this.reverse = [11,0,9,-2];
+    this.rotated = false;
+    this.pivot = 15;
+    this.active = true;
+  };
+
+  var RightSFactory = function(){
+    this.positions = [5,15,14,24]; // id of element
+    // this.shape = 'right_s';
+    this.color = addColor();
+    this.structure = [9,0,11,2];
+    this.reverse = [9,0,11,2];
+    this.rotated = false;
+    // this.pivot = 15;
+    this.active = true;
+  };
+
+  var LineFactory = function(){
+    this.positions = [5,6,7,8]; // id of element
+    // this.shape = 'line';
+    this.color = addColor();
+    this.structure = [1,1,1,1];
+    // this.pivot = 8;
+    this.active = true;
+  };
+
+  var LeftHandLFactory = function(){
+    this.positions = [5,6,7,17]; // id of element
+    // this.shape = 'left_l';
+    this.color = addColor();
+    this.structure = [-18,-9,0,-11];
+    // this.pivot = 7;
+    this.active = true;
+  };
+
+  var RightHandLFactory = function(){
+    this.positions = [15,5,6,7]; // id of element
+    // this.shape = 'right_l';
+    this.color = addColor();
+    this.structure = [11,20,9,-2];
+    this.reverse = [2,9,20,-9]; // [-10,-1,-10,19];
+    this.rotated = false;
+    // this.pivot = 5;
+    this.active = true;
+  };
+
+  var TFactory = function(){
+    this.positions = [5,6,7,16]; // id of element
+    // this.shape = 't';
+    this.color = addColor();
+    this.structure = [1,1,1,1];
+    // this.pivot = 6;
+    this.active = true;
+  };
+
+  var rotate = function(piece, direction){
+    console.log(piece);
+    for(var i = 0; i < piece.positions.length; i++){
+      if (!piece.rotated){
+        piece.positions[i] += piece.structure[i];
+      } else {
+        piece.positions[i] -= piece.structure[i];
+      }
+    }
+    piece.rotated = piece.rotated ? false : true;
+  };
+
+  return {
+    create: create,
+    rotate: rotate
+  };
+
+})();
+
+var gameStateModel = (function(pieceModel, $){
+
+  var gameboard =  {};
+  var divsToDestroy = [];
+  var currentPiece = '';
+  // pieceQueue = [];
+  // addPieceToQueue = function(){
+  //   pieceModel.pieceQueue.push(pieceModel.createPiece());
+  // },
+
+  var init = function(){
+    createGameboard();
+  };
+
+  var createGameboard = function(){
+    for (var i = 0; i < controller.gridSize; i++){
+      gameboard[i] = "";
+    }
+    currentPiece = pieceModel.create();
+    currentPiece.positions.forEach(function(el){
+      gameboard[el] = currentPiece;
+    });
+    gameboard[currentPiece.positons] = currentPiece;
+  };
+
+  var getGameboard = function(){
+    return gameboard;
+  };
+
+  var setGameboard = function(position, piece){
+    gameboard[position] = piece;
+  };
+
+  var getCurrentPiece = function(){
+    return currentPiece;
+  };
+
   var newCurrentPiece = function(){
-    model.currentPiece = createPiece();
-    for(var i=0; i < model.currentPiece.positions; i++){
-      model.gameboard[model.currentPiece.positons[i]] = model.currentPiece;
+    currentPiece = pieceModel.create();
+    for(var i=0; i < currentPiece.positions; i++){
+      gameboard[currentPiece.positons[i]] = currentPiece;
     }
   };
 
   var stopPieceMovement = function(){
-    model.currentPiece.active = false;
+    currentPiece.active = false;
     newCurrentPiece();
   };
 
@@ -69,10 +159,10 @@ var model = (function(){
     var row_full = false;
     for(var i = controller.gridSize-1; i >= 0; i-=view.step){
       row_full = true;
-      divsToDestroy = []
+      divsToDestroy = [];
       for(var j = i; j > i - view.step; j--){
         divsToDestroy.push(j);
-        if (model.gameboard[j] === ''){row_full = false;}
+        if (gameboard[j] === ''){row_full = false;}
       }
       if (row_full){destroyLine();}
     }
@@ -82,113 +172,33 @@ var model = (function(){
       for(var i=0; i < view.step; i++){
         deleteDiv = divsToDestroy[i];
         while (deleteDiv-view.step > 0) {
-          model.gameboard[deleteDiv] = model.gameboard[deleteDiv-view.step];
+          gameboard[deleteDiv] = gameboard[deleteDiv-view.step];
           deleteDiv = deleteDiv-view.step;
         }
       }
   };
 
-  var SquareFactory = function(){
-    this.positions = [5,6,15,16]; // id of element
-    this.shape = 'square';
-    this.color = colorPiece();
-    this.structure = [1,1,1,1];
-    this.pivot = 6;
-    this.active = true;
-  };
-
-  var LeftSFactory = function(){
-    this.positions = [5,15,16,26]; // id of element
-    this.shape = 'left_s';
-    this.color = colorPiece();
-    this.structure = [11,0,9,-2];
-    this.reverse = [11,0,9,-2];
-    this.rorated = false;
-    // this.pivot = 15;
-    this.active = true;
-  };
-
-  var RightSFactory = function(){
-    this.positions = [5,15,14,24]; // id of element
-    this.shape = 'right_s';
-    this.color = colorPiece();
-    this.structure = [9,0,11,2];
-    this.reverse = [9,0,11,2];
-    this.rorated = false;
-    // this.pivot = 15;
-    this.active = true;
-  };
-
-  var LineFactory = function(){
-    this.positions = [5,6,7,8]; // id of element
-    this.shape = 'line';
-    this.color = colorPiece();
-    this.structure = [1,1,1,1];
-    this.pivot = 8;
-    this.active = true;
-  };
-
-  var LeftHandLFactory = function(){
-    this.positions = [5,6,7,17]; // id of element
-    this.shape = 'left_l';
-    this.color = colorPiece();
-    this.structure = [-18,-9,0,-11];
-    this.pivot = 7;
-    this.active = true;
-  };
-
-  var RightHandLFactory = function(){
-    this.positions = [15,5,6,7]; // id of element
-    this.shape = 'right_l';
-    this.color = colorPiece();
-    this.structure = [11,20,9,-2];
-    this.reverse = [2,9,20,-9]; // [-10,-1,-10,19];
-    this.rorated = false;
-    this.pivot = 5;
-    this.active = true;
-  };
-
-  var TFactory = function(){
-    this.positions = [5,6,7,16]; // id of element
-    this.shape = 't';
-    this.color = colorPiece();
-    this.structure = [1,1,1,1];
-    this.pivot = 6;
-    this.active = true;
-  };
-
-  var rotatePiece = function(direction){
-    for(var i = 0; i < model.currentPiece.positions.length; i++){
-      if (!model.currentPiece.rotated){
-        model.currentPiece.positions[i] += model.currentPiece.structure[i];
-      } else {
-        model.currentPiece.positions[i] -= model.currentPiece.structure[i];
-      }
-    }
-    model.currentPiece.rotated = model.currentPiece.rotated ? false : true;
-  };
-
   return {
     init: init,
-    gameboard: gameboard,
-    currentPiece: currentPiece,
+    setGameboard: setGameboard,
+    getGameboard: getGameboard,
+    getCurrentPiece: getCurrentPiece,
     checkAndDestroyLine: checkAndDestroyLine,
     stopPieceMovement: stopPieceMovement,
-    rotatePiece: rotatePiece
   };
 
-})();
+})(pieceModel, $);
 
 // --------- View -----------
 
-var view = (function(){
+var view = (function(gameStateModel, $){
 
   var currentDirection = '';
   var step = 10;
 
   var init = function(gridSize){
     initializeGrid(gridSize);
-    initializePiece();
+    setPiece();
     setDirectionListener();
   };
 
@@ -202,9 +212,10 @@ var view = (function(){
     }
   };
 
-  var initializePiece = function(){
-    for (var i = 0; i < model.currentPiece.positions.length; i++){
-      $('#'+ model.currentPiece.positions[i]).addClass(model.currentPiece.color);
+  var setPiece = function(){
+    var currentPiece = gameStateModel.getCurrentPiece();
+    for (var i = 0; i < currentPiece.positions.length; i++){
+      $('#'+ currentPiece.positions[i]).addClass(currentPiece.color);
     }
   };
 
@@ -221,8 +232,8 @@ var view = (function(){
 
   var renderGameboard = function(){
     for (var i = 0; i < controller.gridSize; i++){
-      if (model.gameboard[i] !== ''){
-        var piece = model.gameboard[i];
+      if (gameStateModel.getGameboard()[i] !== ''){
+        var piece = gameStateModel.getGameboard()[i];
         $("#" + i).addClass(piece.color);
       } else {
         $("#" + i).removeClass('green').removeClass('blue').removeClass('yellow').removeClass('red');
@@ -242,36 +253,46 @@ var view = (function(){
   };
 
   var checkMovements = function(){
-    for (var i = 0; i < model.currentPiece.positions.length; i++){
-      var currentID = model.currentPiece.positions[i];
+    var piece = gameStateModel.getCurrentPiece();
+    var gameboard = gameStateModel.getGameboard();
+    for (var i = 0; i < piece.positions.length; i++){
+      var currentID = gameStateModel.getCurrentPiece().positions[i];
       if (currentID + step > 199 ||
         testIfBrick(currentID + step) &&
-        !(model.gameboard[currentID + step].active)
+        !(gameboard[currentID + step].active)
         ){
-        model.stopPieceMovement();
+        gameStateModel.stopPieceMovement();
       } else {
-        if (currentID + step + step > 199 ||
-            testIfBrick(currentID + step + step) ||
-            testIfBrick(currentID + step + 1) && !(model.gameboard[currentID + step + 1].active) ||
-            testIfBrick(currentID + step - 1) && !(model.gameboard[currentID + step - 1].active)
-            ) {
-          currentDirection = '38';
-        }
+        slowDownBeforeCollision(currentID, gameboard);
       }
     }
   };
 
+  var slowDownBeforeCollision = function(currentID, gameboard){
+    if (currentID + step + step > 199 ||
+        testIfBrick(currentID + step + step) ||
+        testIfBrick(currentID + step + 1) &&
+        !(gameboard[currentID + step + 1].active) ||
+        testIfBrick(currentID + step - 1) &&
+        !(gameboard[currentID + step - 1].active)
+        ) {
+          currentDirection = '38';
+        }
+  };
+
   var removeClasses = function(){
-    for (var i=0; i < model.currentPiece.positions.length; i++) {
-      $('#' + model.currentPiece.positions[i]).removeClass(model.currentPiece.color);
-      model.gameboard[model.currentPiece.positions[i]] = '';
+    var piece = gameStateModel.getCurrentPiece();
+    for (var i=0; i < piece.positions.length; i++) {
+      $('#' + piece.positions[i]).removeClass(piece.color);
+      gameStateModel.setGameboard(piece.positions[i], '');
     }
   };
 
   var addClasses = function(divIdsToMoveTo){
+    var piece = gameStateModel.getCurrentPiece();
     for (var i=0; i < divIdsToMoveTo.length; i++) {
-      $('#' + divIdsToMoveTo[i]).addClass(model.currentPiece.color);
-      model.gameboard[divIdsToMoveTo[i]] = model.currentPiece;
+      $('#' + divIdsToMoveTo[i]).addClass(piece.color);
+      gameStateModel.setGameboard(divIdsToMoveTo[i], piece);
     }
   };
 
@@ -279,11 +300,11 @@ var view = (function(){
     removeClasses();
     var divIdsToMoveTo = newPieceDiv();
     addClasses(divIdsToMoveTo);
-    model.currentPiece.positions = divIdsToMoveTo;
+    gameStateModel.getCurrentPiece().positions = divIdsToMoveTo;
   };
 
   var destoryStaticPieces = function(){
-    model.checkAndDestroyLine();
+    gameStateModel.checkAndDestroyLine();
     renderGameboard();
   };
 
@@ -293,72 +314,67 @@ var view = (function(){
 
   var newPieceDiv = function() {
     var divIdsToMoveTo = [];
+    var piece = gameStateModel.getCurrentPiece();
     var moveID, currentDivID;
-    var doNotMove = false;
+
     switch (currentDirection) {
       case 'left':
-        for (var m = 0; m < model.currentPiece.positions.length; m++){
-          currentDivID = model.currentPiece.positions[m];
-          if (currentDivID%10 === 0){ doNotMove = true; }
-        }
-
-        if(!doNotMove) {
-          for (var l = 0; l < model.currentPiece.positions.length; l++){
-            moveID = (model.currentPiece.positions[l] - 1 + step);
-            divIdsToMoveTo.push(moveID);
-          }
-        } else {
-          for (var p = 0; p < model.currentPiece.positions.length; p++){
-          moveID = model.currentPiece.positions[p] + step;
-          divIdsToMoveTo.push(moveID);
-          }
-        }
+        divIdsToMoveTo = leftRightMoveDivIDS(0, -1);
         break;
 
       case 'right':
-        for (var t = 0; t < model.currentPiece.positions.length; t++){
-          currentDivID = model.currentPiece.positions[t];
-          if (currentDivID%10 === 9){ doNotMove = true; }
-        }
-
-        if(!doNotMove) {
-          for (var u = 0; u < model.currentPiece.positions.length; u++){
-            moveID = (model.currentPiece.positions[u] + 1 + step);
-            divIdsToMoveTo.push(moveID);
-          }
-        } else {
-          for (var q = 0; q < model.currentPiece.positions.length; q++){
-          moveID = model.currentPiece.positions[q] + step;
-          divIdsToMoveTo.push(moveID);
-          }
-        }
+        divIdsToMoveTo = leftRightMoveDivIDS(9, 1);
         break;
 
       case 'down':
-        for (var j = 0; j < model.currentPiece.positions.length; j++){
-          moveID = model.currentPiece.positions[j] + step*3;
+        for (var j = 0; j < piece.positions.length; j++){
+          moveID = piece.positions[j] + step*3;
           divIdsToMoveTo.push(moveID);
         }
         break;
 
       case 'rotate_left':
-        model.rotatePiece();
-        divIdsToMoveTo = model.currentPiece.positions;
+        pieceModel.rotate(piece);
+        divIdsToMoveTo = piece.positions;
         break;
 
       case 'rotate_right':
-        model.rotatePiece();
-        divIdsToMoveTo = model.currentPiece.positions;
+        pieceModel.rotate(piece);
+        divIdsToMoveTo = piece.positions;
         break;
 
       default:
-        for (var k = 0; k < model.currentPiece.positions.length; k++){
-          moveID = model.currentPiece.positions[k] + step;
+        for (var k = 0; k < piece.positions.length; k++){
+          moveID = piece.positions[k] + step;
           divIdsToMoveTo.push(moveID);
         }
     }
     currentDirection = '38';
     console.log(divIdsToMoveTo);
+    return divIdsToMoveTo;
+  };
+
+
+  var leftRightMoveDivIDS = function(gridSideID, positionStep){
+    var piece = gameStateModel.getCurrentPiece();
+    var divIdsToMoveTo = [];
+    var doNotMove = false;
+
+    for (var t = 0; t < piece.positions.length; t++){
+      currentDivID = piece.positions[t];
+      if (currentDivID%10 === gridSideID){ doNotMove = true; }
+    }
+    if(!doNotMove) {
+      for (var u = 0; u < piece.positions.length; u++){
+        moveID = (piece.positions[u] + positionStep + step);
+        divIdsToMoveTo.push(moveID);
+      }
+    } else {
+      for (var q = 0; q < piece.positions.length; q++){
+      moveID = piece.positions[q] + step;
+      divIdsToMoveTo.push(moveID);
+      }
+    }
     return divIdsToMoveTo;
   };
 
@@ -375,7 +391,7 @@ var view = (function(){
     updatePieces: updatePieces
   };
 
-})();
+})(gameStateModel, $);
 
 // --------- Controller -----------
 
@@ -386,7 +402,7 @@ var controller = (function(){
 
   init = function(){
     setDifficultyLevel();
-    model.init();
+    gameStateModel.init();
     view.init(controller.gridSize);
     gameLoop();
   };
