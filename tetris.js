@@ -1,161 +1,163 @@
 
 // --------- Model -----------
 
-var model = {
+var model = (function(){
+  var gameboard =  {};
+  // pieceQueue = [];
+  var currentPiece = '';
+  var divsToDestroy = [];
 
-  gameboard:  {},
-  // pieceQueue: [],
-  currentPiece: '',
-  divsToDestroy: [],
+  var init = function(){
+    createGameBoard();
+  };
 
-  init: function(){
-    model.createGameBoard();
-  },
-
-  createGameBoard: function(){
+  var createGameBoard = function(){
     for (var i = 0; i < controller.gridSize; i++){
       model.gameboard[i] = "";
     }
-    model.currentPiece = model.createPiece();
+    model.currentPiece = createPiece();
     model.currentPiece.positions.forEach(function(el){
       model.gameboard[el] = model.currentPiece;
     });
     model.gameboard[model.currentPiece.positons] = model.currentPiece;
-  },
+  };
 
-  factorySelection: function(){
+  var getGameBoard = function(){
+    return gameboard;
+  };
+
+  var setGameBoard = function(i, object){
+    gameboard[i] = object;
+  };
+
+  var getCurrentPiece = function(){
+    return currentPiece;
+  };
+
+  var createPiece = function(){
     var num = Math.floor(Math.random() * 7);
     // var num = Math.floor(Math.random() * 1);
     // var pieces = ["RightHandLFactory"];
-    var pieces = ["SquareFactory", "LineFactory", "TFactory",
-                  "RightHandLFactory", "LeftHandLFactory",
-                  "LeftSFactory", "RightSFactory"];
-    return new model[pieces[num]]();
-  },
+    var pieces = [SquareFactory, LineFactory, TFactory,
+                  RightHandLFactory, LeftHandLFactory,
+                  LeftSFactory, RightSFactory];
+    return new pieces[num]();
+  };
 
-  createPiece: function(){
-    return model.factorySelection();
-  },
-
-  // addPieceToQueue: function(){
+  // addPieceToQueue = function(){
   //   model.pieceQueue.push(model.createPiece());
   // },
 
-  colorPiece: function(){
+  var colorPiece = function(){
     var colors = ['blue','red','green','yellow'];
     return colors[Math.floor(Math.random()*4)];
-  },
+  };
 
-  newCurrentPiece: function(){
-    model.currentPiece = model.createPiece();
+  var newCurrentPiece = function(){
+    model.currentPiece = createPiece();
     for(var i=0; i < model.currentPiece.positions; i++){
       model.gameboard[model.currentPiece.positons[i]] = model.currentPiece;
     }
-  },
+  };
 
-  stopPieceMovement: function(){
+  var stopPieceMovement = function(){
     model.currentPiece.active = false;
-    model.newCurrentPiece();
-  },
+    newCurrentPiece();
+  };
 
-  checkAndDestroyLine: function(){
+  var checkAndDestroyLine = function(){
     var row_full = false;
     for(var i = controller.gridSize-1; i >= 0; i-=view.step){
       row_full = true;
-      model.divsToDestroy = [];
+      divsToDestroy = []
       for(var j = i; j > i - view.step; j--){
-        model.divsToDestroy.push(j);
-        if (model.gameboard[j] === ''){
-          row_full = false;
-        }
+        divsToDestroy.push(j);
+        if (model.gameboard[j] === ''){row_full = false;}
       }
-      if (row_full){
-        // console.log("check destroy line is running " + model.divsToDestroy.length);
-        model.destroyLine();
-      }
+      if (row_full){destroyLine();}
     }
-  },
+  };
 
-  destroyLine: function(){
+  var destroyLine = function(){
       for(var i=0; i < view.step; i++){
-        deleteDiv = model.divsToDestroy[i];
+        deleteDiv = divsToDestroy[i];
         while (deleteDiv-view.step > 0) {
           model.gameboard[deleteDiv] = model.gameboard[deleteDiv-view.step];
           deleteDiv = deleteDiv-view.step;
         }
       }
-  },
+  };
 
-  SquareFactory: function(){
+  var SquareFactory = function(){
     this.positions = [5,6,15,16]; // id of element
     this.shape = 'square';
-    this.color = model.colorPiece();
+    this.color = colorPiece();
     this.structure = [1,1,1,1];
     this.pivot = 6;
     this.active = true;
-  },
+  };
 
-  LeftSFactory: function(){
+  var LeftSFactory = function(){
     this.positions = [5,15,16,26]; // id of element
     this.shape = 'left_s';
-    this.color = model.colorPiece();
+    this.color = colorPiece();
     this.structure = [11,0,9,-2];
     this.reverse = [11,0,9,-2];
     this.rorated = false;
     // this.pivot = 15;
     this.active = true;
-  },
+  };
 
-  RightSFactory: function(){
+  var RightSFactory = function(){
     this.positions = [5,15,14,24]; // id of element
     this.shape = 'right_s';
-    this.color = model.colorPiece();
+    this.color = colorPiece();
     this.structure = [9,0,11,2];
     this.reverse = [9,0,11,2];
     this.rorated = false;
     // this.pivot = 15;
     this.active = true;
-  },
+  };
 
-  LineFactory: function(){
+  var LineFactory = function(){
     this.positions = [5,6,7,8]; // id of element
     this.shape = 'line';
-    this.color = model.colorPiece();
+    this.color = colorPiece();
     this.structure = [1,1,1,1];
     this.pivot = 8;
     this.active = true;
-  },
+  };
 
-  LeftHandLFactory: function(){
+  var LeftHandLFactory = function(){
     this.positions = [5,6,7,17]; // id of element
     this.shape = 'left_l';
-    this.color = model.colorPiece();
+    this.color = colorPiece();
     this.structure = [-18,-9,0,-11];
     this.pivot = 7;
     this.active = true;
-  },
+  };
 
-  RightHandLFactory: function(){
+  var RightHandLFactory = function(){
     this.positions = [15,5,6,7]; // id of element
     this.shape = 'right_l';
-    this.color = model.colorPiece();
+    this.color = colorPiece();
     this.structure = [11,20,9,-2];
     this.reverse = [2,9,20,-9]; // [-10,-1,-10,19];
     this.rorated = false;
     this.pivot = 5;
     this.active = true;
-  },
+  };
 
-  TFactory: function(){
+  var TFactory = function(){
     this.positions = [5,6,7,16]; // id of element
     this.shape = 't';
-    this.color = model.colorPiece();
+    this.color = colorPiece();
     this.structure = [1,1,1,1];
     this.pivot = 6;
     this.active = true;
-  },
+  };
 
-  rotatePiece: function(direction){
+  var rotatePiece = function(direction){
     for(var i = 0; i < model.currentPiece.positions.length; i++){
       if (!model.currentPiece.rotated){
         model.currentPiece.positions[i] += model.currentPiece.structure[i];
@@ -164,25 +166,33 @@ var model = {
       }
     }
     model.currentPiece.rotated = model.currentPiece.rotated ? false : true;
-  }
-};
+  };
+
+  return {
+    init: init,
+    gameboard: gameboard,
+    currentPiece: currentPiece,
+    checkAndDestroyLine: checkAndDestroyLine,
+    stopPieceMovement: stopPieceMovement,
+    rotatePiece: rotatePiece
+  };
+
+})();
 
 // --------- View -----------
 
-var view = {
+var view = (function(){
 
-  currentDirection: '',
-  step: 10,
+  var currentDirection = '';
+  var step = 10;
 
-  init: function(gridSize){
-    view.initializeGrid(gridSize);
-    view.initializePiece();
-    $(document).keydown(function(event){
-      view.setPieceDirection(event);
-    });
-  },
+  var init = function(gridSize){
+    initializeGrid(gridSize);
+    initializePiece();
+    setDirectionListener();
+  };
 
-  initializeGrid: function(gridSize){
+  var initializeGrid = function(gridSize){
     for(var i=1; i <= gridSize; i++){
       $('#gameboard').append('<div class="cell" id="'+(i-1)+'"></div>');
       console.log(gridSize);
@@ -190,20 +200,26 @@ var view = {
         $('#gameboard').append('<br>');
       }
     }
-  },
+  };
 
-  initializePiece: function(){
+  var initializePiece = function(){
     for (var i = 0; i < model.currentPiece.positions.length; i++){
       $('#'+ model.currentPiece.positions[i]).addClass(model.currentPiece.color);
     }
-  },
+  };
 
-  updatePieces: function(){
-    view.moveActivePieces();
-    view.destoryStaticPieces();
-  },
+  var setDirectionListener = function(){
+    $(document).keydown(function(event){
+      setPieceDirection(event);
+    });
+  };
 
-  renderGameboard: function(){
+  var updatePieces = function(){
+    moveActivePieces();
+    destoryStaticPieces();
+  };
+
+  var renderGameboard = function(){
     for (var i = 0; i < controller.gridSize; i++){
       if (model.gameboard[i] !== ''){
         var piece = model.gameboard[i];
@@ -212,108 +228,107 @@ var view = {
         $("#" + i).removeClass('green').removeClass('blue').removeClass('yellow').removeClass('red');
       }
     }
-  },
+  };
 
-  testIfBrick: function(div){
+  var testIfBrick = function(div){
     return $('#' + (div)).hasClass("blue") || $('#' + (div)).hasClass("yellow") ||
            $('#' + (div)).hasClass("red")  || $('#' + (div)).hasClass("green");
-  },
+  };
 
-  moveActivePieces: function(){
-    view.checkMovements();
-    view.makeMove();
-    view.destoryStaticPieces();
-  },
+  var moveActivePieces = function(){
+    checkMovements();
+    makeMove();
+    destoryStaticPieces();
+  };
 
-  checkMovements: function(){
+  var checkMovements = function(){
     for (var i = 0; i < model.currentPiece.positions.length; i++){
       var currentID = model.currentPiece.positions[i];
-      if (currentID + view.step > 199 ||
-        view.testIfBrick(currentID + view.step) &&
-        !(model.gameboard[currentID + view.step].active)
+      if (currentID + step > 199 ||
+        testIfBrick(currentID + step) &&
+        !(model.gameboard[currentID + step].active)
         ){
         model.stopPieceMovement();
       } else {
-        if (currentID + view.step + view.step > 199 ||
-            view.testIfBrick(currentID + view.step + view.step) ||
-            view.testIfBrick(currentID + view.step + 1) && !(model.gameboard[currentID + view.step + 1].active) ||
-            view.testIfBrick(currentID + view.step - 1) && !(model.gameboard[currentID + view.step - 1].active)
+        if (currentID + step + step > 199 ||
+            testIfBrick(currentID + step + step) ||
+            testIfBrick(currentID + step + 1) && !(model.gameboard[currentID + step + 1].active) ||
+            testIfBrick(currentID + step - 1) && !(model.gameboard[currentID + step - 1].active)
             ) {
-          view.currentDirection = '38';
+          currentDirection = '38';
         }
       }
     }
-  },
+  };
 
-  removeClasses: function(){
+  var removeClasses = function(){
     for (var i=0; i < model.currentPiece.positions.length; i++) {
       $('#' + model.currentPiece.positions[i]).removeClass(model.currentPiece.color);
       model.gameboard[model.currentPiece.positions[i]] = '';
     }
-  },
+  };
 
-  addClasses: function(divIdsToMoveTo){
+  var addClasses = function(divIdsToMoveTo){
     for (var i=0; i < divIdsToMoveTo.length; i++) {
       $('#' + divIdsToMoveTo[i]).addClass(model.currentPiece.color);
       model.gameboard[divIdsToMoveTo[i]] = model.currentPiece;
     }
-  },
+  };
 
-  makeMove: function(){
-    view.removeClasses();
-    var divIdsToMoveTo = view.newPieceDiv();
-    view.addClasses(divIdsToMoveTo);
+  var makeMove = function(){
+    removeClasses();
+    var divIdsToMoveTo = newPieceDiv();
+    addClasses(divIdsToMoveTo);
     model.currentPiece.positions = divIdsToMoveTo;
-  },
+  };
 
-  destoryStaticPieces: function(){
+  var destoryStaticPieces = function(){
     model.checkAndDestroyLine();
-    view.renderGameboard();
-  },
+    renderGameboard();
+  };
 
-  setPieceDirection: function(event){
-    view.currentDirection = view.userMove[event.which];
-  },
+  var setPieceDirection = function(event){
+    currentDirection = userMove[event.which];
+  };
 
-  newPieceDiv: function() {
+  var newPieceDiv = function() {
     var divIdsToMoveTo = [];
-    var moveID = 0;
-    switch (this.currentDirection) {
-      case 'left' :
-        var doNotMove = false;
+    var moveID, currentDivID;
+    var doNotMove = false;
+    switch (currentDirection) {
+      case 'left':
         for (var m = 0; m < model.currentPiece.positions.length; m++){
-          var currentDivID = model.currentPiece.positions[m];
+          currentDivID = model.currentPiece.positions[m];
           if (currentDivID%10 === 0){ doNotMove = true; }
         }
 
         if(!doNotMove) {
           for (var l = 0; l < model.currentPiece.positions.length; l++){
-            moveID = (model.currentPiece.positions[l] - 1 + view.step);
+            moveID = (model.currentPiece.positions[l] - 1 + step);
             divIdsToMoveTo.push(moveID);
           }
         } else {
           for (var p = 0; p < model.currentPiece.positions.length; p++){
-          moveID = model.currentPiece.positions[p] + view.step;
+          moveID = model.currentPiece.positions[p] + step;
           divIdsToMoveTo.push(moveID);
           }
         }
         break;
 
-      case 'right' :
-        var doNotMove = false;
-        for (var m = 0; m < model.currentPiece.positions.length; m++){
-          var currentDivID = model.currentPiece.positions[m];
+      case 'right':
+        for (var t = 0; t < model.currentPiece.positions.length; t++){
+          currentDivID = model.currentPiece.positions[t];
           if (currentDivID%10 === 9){ doNotMove = true; }
         }
 
         if(!doNotMove) {
-          for (var l = 0; l < model.currentPiece.positions.length; l++){
-            moveID = (model.currentPiece.positions[l] + 1 + view.step);
+          for (var u = 0; u < model.currentPiece.positions.length; u++){
+            moveID = (model.currentPiece.positions[u] + 1 + step);
             divIdsToMoveTo.push(moveID);
           }
         } else {
-          for (var p = 0; p < model.currentPiece.positions.length; p++){
-          moveID = model.currentPiece.positions[p] + view.step;
+          for (var q = 0; q < model.currentPiece.positions.length; q++){
+          moveID = model.currentPiece.positions[q] + step;
           divIdsToMoveTo.push(moveID);
           }
         }
@@ -321,7 +336,7 @@ var view = {
 
       case 'down':
         for (var j = 0; j < model.currentPiece.positions.length; j++){
-          moveID = model.currentPiece.positions[j] + view.step*3;
+          moveID = model.currentPiece.positions[j] + step*3;
           divIdsToMoveTo.push(moveID);
         }
         break;
@@ -338,49 +353,59 @@ var view = {
 
       default:
         for (var k = 0; k < model.currentPiece.positions.length; k++){
-          moveID = model.currentPiece.positions[k] + view.step;
+          moveID = model.currentPiece.positions[k] + step;
           divIdsToMoveTo.push(moveID);
         }
     }
-    this.currentDirection = '38';
+    currentDirection = '38';
     console.log(divIdsToMoveTo);
     return divIdsToMoveTo;
-  },
+  };
 
-  userMove: {
+  var userMove = {
     37: 'left',
     39: 'right',
     40: 'down',
     81: 'rotate_left',
     87: 'rotate_right'
-  }
+  };
 
-};
+  return {
+    init: init,
+    updatePieces: updatePieces
+  };
+
+})();
 
 // --------- Controller -----------
 
-var controller = {
+var controller = (function(){
 
-  gridSize: 200,
-  level: 1,
+  var gridSize = 200;
+  var level = 1;
 
-  init: function(){
-    controller.setDifficultyLevel();
+  init = function(){
+    setDifficultyLevel();
     model.init();
     view.init(controller.gridSize);
-    controller.gameLoop();
-  },
+    gameLoop();
+  };
 
-  gameLoop: function(){
+  var gameLoop = function(){
     window.gameLoop = window.setInterval(function(){
       view.updatePieces();
-    }, 400 / controller.level);
-  },
+    }, 400 / level);
+  };
 
-  setDifficultyLevel: function(){
+  var setDifficultyLevel = function(){
     controller.level = prompt("Select difficulty: Enter 1 for easy, 2 for difficult");
-  }
+  };
 
-};
+  return {
+    init: init,
+    gridSize: gridSize
+  };
+
+})();
 
 $(document).ready(function(){controller.init();});
