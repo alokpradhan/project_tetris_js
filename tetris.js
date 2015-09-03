@@ -24,10 +24,12 @@ var model = {
   },
 
   factorySelection: function(){
-    var num = Math.floor(Math.random() * 7)
-    var pieces = ["SquareFactory", "LineFactory", "TFactory",
-                  "RightHandLFactory", "LeftHandLFactory",
-                  "LeftSFactory", "RightSFactory"]
+    // var num = Math.floor(Math.random() * 7);
+    var num = Math.floor(Math.random() * 2);
+    var pieces = ["LeftSFactory", "RightSFactory"];
+    // var pieces = ["SquareFactory", "LineFactory", "TFactory",
+    //               "RightHandLFactory", "LeftHandLFactory",
+    //               "LeftSFactory", "RightSFactory"];
     return new model[pieces[num]]();
   },
 
@@ -97,8 +99,9 @@ var model = {
     this.positions = [5,15,16,26]; // id of element
     this.shape = 'left_s';
     this.color = model.colorPiece();
-    this.structure = [1,1,1,1];
-    this.pivot = 15;
+    this.structure = [11,0,9,-2];
+    this.rorated = false;
+    // this.pivot = 15;
     this.active = true;
   },
 
@@ -107,7 +110,8 @@ var model = {
     this.shape = 'right_s';
     this.color = model.colorPiece();
     this.structure = [11,0,9,-2];
-    this.pivot = 15;
+    this.rorated = false;
+    // this.pivot = 15;
     this.active = true;
   },
 
@@ -148,7 +152,14 @@ var model = {
   },
 
   rotatePiece: function(){
-
+    for(var i = 0; i < model.currentPiece.positions.length; i++){
+      if (!model.currentPiece.rotated){
+        model.currentPiece.positions[i] += model.currentPiece.structure[i];
+      } else {
+        model.currentPiece.positions[i] -= model.currentPiece.structure[i];
+      }
+    }
+    model.currentPiece.rotated = model.currentPiece.rotated ? false : true;
   }
 };
 
@@ -245,8 +256,8 @@ var view = {
   },
 
   makeMove: function(){
-    var divIdsToMoveTo = view.newPieceDiv();
     view.removeClasses();
+    var divIdsToMoveTo = view.newPieceDiv();
     view.addClasses(divIdsToMoveTo);
     model.currentPiece.positions = divIdsToMoveTo;
   },
@@ -303,17 +314,20 @@ var view = {
           }
         }
         break;
-        // for (var i = 0; i < model.currentPiece.positions.length; i++){
-        //   moveID = (model.currentPiece.positions[i]%10 === 9) ?
-        //             model.currentPiece.positions[i] : (model.currentPiece.positions[i] + 1 + view.step);
-        //   divIdsToMoveTo.push(moveID);
-        // }
-        // break;
+
       case 'down':
         for (var j = 0; j < model.currentPiece.positions.length; j++){
           moveID = model.currentPiece.positions[j] + view.step*3;
           divIdsToMoveTo.push(moveID);
         }
+        break;
+      case 'rotate_left':
+        model.rotatePiece();
+        divIdsToMoveTo = model.currentPiece.positions;
+        break;
+      case 'rotate_right':
+        model.rotatePiece();
+        divIdsToMoveTo = model.currentPiece.positions;
         break;
       default:
         for (var k = 0; k < model.currentPiece.positions.length; k++){
@@ -323,14 +337,16 @@ var view = {
         // divIdToMoveTo = currentDiv + view.step;
     }
     this.currentDirection = '38';
-    console.log(divIdsToMoveTo);
+    // console.log(divIdsToMoveTo);
     return divIdsToMoveTo;
   },
 
   userMove: {
     37: 'left',
     39: 'right',
-    40: 'down'
+    40: 'down',
+    81: 'rotate_left',
+    87: 'rotate_right'
   }
 
 };
@@ -352,7 +368,7 @@ var controller = {
   gameLoop: function(){
     window.gameLoop = window.setInterval(function(){
       view.updatePieces();
-    }, 100 / controller.level);
+    }, 400 / controller.level);
   },
 
   setDifficultyLevel: function(){
