@@ -24,12 +24,12 @@ var model = {
   },
 
   factorySelection: function(){
-    // var num = Math.floor(Math.random() * 7);
-    var num = Math.floor(Math.random() * 1);
-    var pieces = ["RightHandLFactory"];
-    // var pieces = ["SquareFactory", "LineFactory", "TFactory",
-    //               "RightHandLFactory", "LeftHandLFactory",
-    //               "LeftSFactory", "RightSFactory"];
+    var num = Math.floor(Math.random() * 7);
+    // var num = Math.floor(Math.random() * 1);
+    // var pieces = ["RightHandLFactory"];
+    var pieces = ["SquareFactory", "LineFactory", "TFactory",
+                  "RightHandLFactory", "LeftHandLFactory",
+                  "LeftSFactory", "RightSFactory"];
     return new model[pieces[num]]();
   },
 
@@ -325,23 +325,25 @@ var view = {
           divIdsToMoveTo.push(moveID);
         }
         break;
+
       case 'rotate_left':
         model.rotatePiece();
         divIdsToMoveTo = model.currentPiece.positions;
         break;
+
       case 'rotate_right':
         model.rotatePiece();
         divIdsToMoveTo = model.currentPiece.positions;
         break;
+
       default:
         for (var k = 0; k < model.currentPiece.positions.length; k++){
           moveID = model.currentPiece.positions[k] + view.step;
           divIdsToMoveTo.push(moveID);
         }
-        // divIdToMoveTo = currentDiv + view.step;
     }
     this.currentDirection = '38';
-    // console.log(divIdsToMoveTo);
+    console.log(divIdsToMoveTo);
     return divIdsToMoveTo;
   },
 
