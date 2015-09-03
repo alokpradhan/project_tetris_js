@@ -24,12 +24,12 @@ var model = {
   },
 
   factorySelection: function(){
-    // var num = Math.floor(Math.random() * 7);
-    var num = Math.floor(Math.random() * 3);
-    var pieces = ["RightHandLFactory"];
-    // var pieces = ["SquareFactory", "LineFactory", "TFactory",
-    //               "RightHandLFactory", "LeftHandLFactory",
-    //               "LeftSFactory", "RightSFactory"];
+    var num = Math.floor(Math.random() * 7);
+    // var num = Math.floor(Math.random() * 3);
+    // var pieces = ["RightHandLFactory"];
+    var pieces = ["SquareFactory", "LineFactory", "TFactory",
+                  "RightHandLFactory", "LeftHandLFactory",
+                  "LeftSFactory", "RightSFactory"];
     return new model[pieces[num]]();
   },
 
