@@ -140,7 +140,7 @@ var model = {
     this.shape = 'right_l';
     this.color = model.colorPiece();
     this.structure = [2,9,20,-9];
-    this.reverse = [-10,-1,-10,19];
+    this.reverse = [-10,-1,-10,9];
     this.pivot = 5;
     this.active = true;
   },
