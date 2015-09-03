@@ -128,7 +128,7 @@ var model = {
     this.positions = [5,6,7,17]; // id of element
     this.shape = 'left_l';
     this.color = model.colorPiece();
-    this.structure = [1,1,1,1];
+    this.structure = [-18,-9,0,-1];
     this.pivot = 7;
     this.active = true;
   },
