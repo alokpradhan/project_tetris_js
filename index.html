@@ -4,17 +4,24 @@
    <title>Tetris</title>
    <link rel="stylesheet" href="tetris.css">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-   <script type="text/javascript" src="tetris.js"></script>
+   <script type="text/javascript" src="user_model.js"></script>
+   <script type="text/javascript" src="piece_model.js"></script>
+   <script type="text/javascript" src="game_state_model.js"></script>
+   <script type="text/javascript" src="view.js"></script>
+   <script type="text/javascript" src="controller.js"></script>
   </head>
 
   <body class="container">
-    <h2>Tetris</h2>
-
     <div class='row'>
-
+      <h2>Tetris</h2>
+    </div>
+    <div class='row'>
       <div class='col-sm-offset-3 col-sm-6' id="gameboard">
       </div>
+    </div>
 
+    <div class='row'>
+      <h4>Score <span id='score'></span></h4>
     </div>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
