@@ -84,6 +84,8 @@ Tetris.State = (function(Piece, User, $){
 // ------ End game and log score ------
 
   var checkEndGame = function(){
+    // return ((gameboard[25] !== undefined) && gameboard[25].active) ? true : false;
+    // In the view, just check if two color overlap or exceed the upper bound
   };
 
   return {
@@ -93,7 +95,8 @@ Tetris.State = (function(Piece, User, $){
     getCurrentPiece: getCurrentPiece,
     setCurrentPiece: setCurrentPiece,
     checkAndDestroyLine: checkAndDestroyLine,
-    stopPieceMovement: stopPieceMovement
+    stopPieceMovement: stopPieceMovement,
+    checkEndGame: checkEndGame
   };
 
 })(Tetris.Piece, Tetris.User, $);
