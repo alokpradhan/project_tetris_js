@@ -2,7 +2,7 @@ var Tetris = Tetris || {};
 
 Tetris.Controller = (function(State, View, User, $){
 
-  var gridSize = 200;
+  var gridSize = 240;
   var level = 1;
 
   init = function(){

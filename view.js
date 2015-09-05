@@ -21,6 +21,9 @@ Tetris.View = (function(State, Piece, User, $){
       if (i % 10 === 0){
         $('#gameboard').append('<br>');
       }
+      if (i <= 40){
+        $('.cell').addClass('transparent');
+      }
     }
     _gridSize = size;
   };
@@ -38,6 +41,7 @@ Tetris.View = (function(State, Piece, User, $){
 
   var _setDirectionListener = function(){
     $(document).keydown(function(event){
+      console.log('triggering listener');
       _setPieceDirection(event);
     });
   };
@@ -59,6 +63,7 @@ Tetris.View = (function(State, Piece, User, $){
   var _makeMove = function(){
     _removeClasses();
     var divIdsToMoveTo = _newPieceDiv();
+    // console.log(divIdsToMoveTo);
     State.setCurrentPiece(divIdsToMoveTo);
     _addClasses(divIdsToMoveTo);
   };
@@ -107,9 +112,10 @@ Tetris.View = (function(State, Piece, User, $){
     var gameboard = State.getGameboard();
     for (var i = 0; i < piece.positions.length; i++){
       var currentID = State.getCurrentPiece().positions[i];
-      if (currentID + _step > 199 ||
-        _testIfBrick(currentID + _step) &&
-        !(gameboard[currentID + _step].active)
+      if (currentID + _step > _gridSize ||
+        _testIfBrick(currentID + _step) && !(gameboard[currentID + _step].active)
+        // || _testIfBrick(currentID + 1) && !(gameboard[currentID + 1].active) ||
+        // _testIfBrick(currentID - 1) && !(gameboard[currentID - 1].active)
         ){
         State.stopPieceMovement();
       } else {
@@ -119,12 +125,11 @@ Tetris.View = (function(State, Piece, User, $){
   };
 
   var _slowDownBeforeCollision = function(currentID, gameboard){
-    if (currentID + _step + _step + _step > 199 ||
-        _testIfBrick(currentID + _step + _step + _step) ||
-        _testIfBrick(currentID + _step + 1) &&
-        !(gameboard[currentID + _step + 1].active) ||
-        _testIfBrick(currentID + _step - 1) &&
-        !(gameboard[currentID + _step - 1].active)
+    var piece = State.getCurrentPiece();
+    if (currentID + _step*3 > _gridSize ||
+        _testIfBrick(currentID + _step*3)   && !(gameboard[currentID + _step*3].active)   ||
+        _testIfBrick(currentID + _step + 1) && !(gameboard[currentID + _step + 1].active) ||
+        _testIfBrick(currentID + _step - 1) && !(gameboard[currentID + _step - 1].active)
         ) {
           _currentDirection = '38';
         }
@@ -135,6 +140,7 @@ Tetris.View = (function(State, Piece, User, $){
 
   var _setPieceDirection = function(event){
     _currentDirection = _userMove[event.which];
+    // console.log(_currentDirection);
   };
 
   var _userMove = {
@@ -167,10 +173,12 @@ Tetris.View = (function(State, Piece, User, $){
         }
         break;
       case 'rotate_left':
+        console.log('rotating left');
         Piece.rotate(piece);
         divIdsToMoveTo = piece.positions;
         break;
       case 'rotate_right':
+        console.log('rotating right');
         Piece.rotate(piece);
         divIdsToMoveTo = piece.positions;
         break;
